@@ -165,40 +165,42 @@ Clist stringSplitBy(CString *string, const char *delimiter)
             size_t partLength = i - start;
 
             /*
-                Allocate the CString object itself
-                through Tony so that its lifetime
-                extends beyond this loop iteration.
+                Only create a CString when the
+                resulting part is not empty.
             */
-            tPtr object = talloc(sizeof(CString));
+            if (partLength > 0) {
 
-            if (object.ptr == NULL) {
-                return result;
-            }
+                tPtr object = talloc(sizeof(CString));
 
-            CString *piece = object.ptr;
+                if (object.ptr == NULL) {
+                    return result;
+                }
 
-            piece->pointer = talloc(partLength + 1);
+                CString *piece = object.ptr;
 
-            if (piece->pointer.ptr == NULL) {
-                destroy(object);
-                return result;
-            }
+                piece->pointer = talloc(partLength + 1);
 
-            memcpy(
-                piece->pointer.ptr,
-                data + start,
-                partLength
-            );
+                if (piece->pointer.ptr == NULL) {
+                    destroy(object);
+                    return result;
+                }
 
-            ((char *)piece->pointer.ptr)[partLength] = '\0';
+                memcpy(
+                    piece->pointer.ptr,
+                    data + start,
+                    partLength
+                );
 
-            piece->pointer.type = TYPE_STRING;
-            piece->length = partLength;
+                ((char *)piece->pointer.ptr)[partLength] = '\0';
 
-            if (!listAppend(&result, piece)) {
-                destroy(piece->pointer);
-                destroy(object);
-                return result;
+                piece->pointer.type = TYPE_STRING;
+                piece->length = partLength;
+
+                if (!listAppend(&result, piece)) {
+                    destroy(piece->pointer);
+                    destroy(object);
+                    return result;
+                }
             }
 
             if (match) {

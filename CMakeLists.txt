@@ -14,6 +14,7 @@ set(COBALT_SOURCES
     src/cobalt/dtypes.c
     src/cobalt/Clist.c
     src/cobalt/Cstring.c
+    src/cobalt/io.c
 )
 
 # Static library

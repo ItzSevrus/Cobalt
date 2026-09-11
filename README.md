@@ -56,7 +56,7 @@ for inspecting the current state of the memory pool.
 
 **CString** is Cobalt's higher-level string abstraction.
 
-It provides a structured representation of a C string while keeping the underlying memory explicitly managed through Tony.
+It provides a structured representation of C strings while keeping their memory explicitly managed through Tony.
 
 A `CString` contains:
 
@@ -67,40 +67,28 @@ typedef struct {
 } CString;
 ```
 
-The `length` field stores the number of characters in the string, excluding the terminating `'\0'`.
-
 CString currently supports:
 
 * String creation
-* Explicit string length tracking
+* Explicit length tracking
 * String equality
 * Substring searching
 * Whitespace trimming
-* Default string splitting
+* String splitting
 * Custom delimiter splitting
 * Multi-character delimiters
-* Preservation of empty fields
 * Integration with Clist
 * Tony-managed string memory
 
 Example:
 
 ```c
-CString string = createString("Hello Cobalt");
+CString text = createString("Hello Cobalt");
 
-printf("Length: %zu\n", stringLength(&string));
+printf("Length: %zu\n", stringLength(&text));
 ```
 
-CString operations can be used directly:
-
-```c
-CString a = createString("Cobalt");
-CString b = createString("Cobalt");
-
-printf("%s\n", stringEquals(&a, &b) ? "true" : "false");
-```
-
-String splitting produces a `Clist`:
+Strings can be split into a `Clist`:
 
 ```c
 CString text = createString("Cobalt makes C easier");
@@ -116,12 +104,12 @@ Output:
 ["Cobalt", "makes", "C", "easier"]
 ```
 
-Custom delimiters are also supported:
+Custom delimiters are supported:
 
 ```c
-CString csv = createString("Sahil,20,Delhi,Cobalt");
+CString data = createString("Sahil,20,Delhi,Cobalt");
 
-Clist fields = stringSplitBy(&csv, ",");
+Clist fields = stringSplitBy(&data, ",");
 
 listPrint(&fields);
 ```
@@ -131,36 +119,6 @@ Output:
 ```text
 ["Sahil", "20", "Delhi", "Cobalt"]
 ```
-
-Multi-character delimiters are supported as well:
-
-```c
-CString data = createString("one::two::three::four");
-
-Clist parts = stringSplitBy(&data, "::");
-
-listPrint(&parts);
-```
-
-Output:
-
-```text
-["one", "two", "three", "four"]
-```
-
-Empty fields are preserved:
-
-```text
-"one,,three,"
-```
-
-produces:
-
-```text
-["one", "", "three", ""]
-```
-
-CString strings are backed by Tony-managed allocations, allowing them to participate naturally in Cobalt's memory management and data structures.
 
 > **Detailed documentation:** [`docs/Cstring.md`](docs/Cstring.md)
 
@@ -220,6 +178,95 @@ CString integrates directly with Clist, allowing strings to be stored alongside 
 
 ---
 
+### I/O — File Handling
+
+**Cobalt I/O** provides a simple abstraction over C's standard file I/O facilities.
+
+The I/O system is represented by `CFile`:
+
+```c
+typedef struct {
+
+    FILE* handle;
+
+    CString filepath;
+
+    CString filename;
+
+    CString mode;
+
+} CFile;
+```
+
+Cobalt I/O currently supports:
+
+* Opening files
+* Closing files
+* Reading entire files
+* Reading individual lines
+* Reading all lines
+* Resetting the file cursor
+* Basic file metadata
+
+Example:
+
+```c
+CFile file = fileOpen(
+    "data/test.txt",
+    "r"
+);
+```
+
+File metadata can be accessed through:
+
+```c
+file.filepath
+file.filename
+file.mode
+```
+
+The entire file can be read into a `CString`:
+
+```c
+CString content = fileRead(&file);
+
+printString(&content);
+```
+
+Individual lines can be read incrementally:
+
+```c
+CString line = fileReadLine(&file);
+
+printString(&line);
+```
+
+All lines can also be loaded into a `Clist`:
+
+```c
+Clist lines = fileReadLines(&file);
+
+listPrint(&lines);
+```
+
+The file cursor can be reset with:
+
+```c
+resetCursor(&file);
+```
+
+and the file can be closed with:
+
+```c
+fileClose(&file);
+```
+
+Cobalt I/O uses the standard C `FILE*` internally while integrating dynamically allocated string data with Tony.
+
+> **Detailed documentation:** [`docs/io.md`](docs/io.md)
+
+---
+
 ## 🧠 Design Philosophy
 
 Cobalt is **not intended to replace C**.
@@ -266,31 +313,49 @@ Cobalt
 │       ├── Splitting
 │       └── Custom delimiters
 │
-└── Clist
-    └── Dynamic heterogeneous lists
-        ├── Element references
-        ├── Dynamic growth
-        ├── Nested lists
-        ├── Mixed data types
-        └── List operations
+├── CString
+│   └── String abstraction
+│       ├── String creation
+│       ├── Length tracking
+│       ├── Equality
+│       ├── Substring search
+│       ├── Trimming
+│       └── Splitting
+│
+├── Clist
+│   └── Dynamic heterogeneous lists
+│       ├── Element references
+│       ├── Dynamic growth
+│       ├── Nested lists
+│       ├── Mixed data types
+│       └── List operations
+│
+└── I/O
+    └── File handling
+        ├── File opening
+        ├── File closing
+        ├── Full file reading
+        ├── Line reading
+        ├── Reading all lines
+        └── Cursor management
 ```
 
-The current relationship between the components is:
+The components work together:
 
 ```text
-                Cobalt
-                   │
-        ┌──────────┴──────────┐
-        │                     │
-      Tony                CString
-        │                     │
-        │                     │
-        └──────────┬──────────┘
-                   │
-                 Clist
+Tony
+ │
+ ├── CString
+ │
+ ├── Clist
+ │
+ └── I/O
+       │
+       ├── CString
+       └── Clist
 ```
 
-Tony provides the memory foundation, CString provides a higher-level string abstraction, and Clist provides a heterogeneous container capable of storing Cobalt data types.
+Tony provides the memory foundation, CString provides string handling, Clist provides heterogeneous collections, and I/O provides file access.
 
 The architecture is actively evolving as the project develops.
 
@@ -342,6 +407,7 @@ Current documentation:
 * [`Tony`](docs/tony.md) — Cobalt's memory management system
 * [`CString`](docs/Cstring.md) — Cobalt's string abstraction
 * [`Clist`](docs/list.md) — Cobalt's dynamic list datatype
+* [`I/O`](docs/io.md) — Cobalt's file I/O system
 
 As new components are added, their documentation will be provided in the same directory.
 
@@ -353,16 +419,15 @@ Cobalt is still in its early development stage.
 
 Planned areas include:
 
-* Expanded string operations
+* File writing
+* File appending
 * Generic data structures
 * Improved type handling
 * Generic operations
 * Additional memory management features
-* File operations
 * CSV parsing
 * Dataset abstractions
 * Data processing utilities
-* Numerical computing
 * Better error handling
 * Expanded testing
 * A stable public API
@@ -378,7 +443,7 @@ The roadmap is intentionally flexible as the architecture evolves.
 
 The API and internal architecture are subject to change.
 
-The project is primarily being developed as an exploration of generic programming, memory management, data structures, string abstractions, and abstraction techniques in C.
+The project is primarily being developed as an exploration of generic programming, memory management, data structures, string abstractions, file handling, and abstraction techniques in C.
 
 It should not yet be considered a production-ready library.
 
