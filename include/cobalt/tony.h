@@ -1,3 +1,7 @@
+/*
+    Author: Sahil Gour
+    Licensed Under: MIT LICENSE
+*/
 #pragma once
 
 #include "cobalt.h"
