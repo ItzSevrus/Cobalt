@@ -13,6 +13,7 @@ set(COBALT_SOURCES
     src/cobalt/tony.c
     src/cobalt/dtypes.c
     src/cobalt/Clist.c
+    src/cobalt/Cstring.c
 )
 
 # Static library
