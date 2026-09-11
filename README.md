@@ -137,6 +137,7 @@ Current documentation:
 
 * [`Project Structure`](docs/project-structure.md) - Project's structure
 * [`Tony`](docs/tony.md) — Cobalt's memory management system
+* [`Clist`](docs/list.md) - Cobalt's Clist datatype
 
 As new components are added, their documentation will be provided in the same directory.
 
