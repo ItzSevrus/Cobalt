@@ -135,6 +135,7 @@ Documentation for individual Cobalt components is provided inside the [`docs/`](
 
 Current documentation:
 
+* [`Project Structure`](docs/project-structure.md) - Project's structure
 * [`Tony`](docs/tony.md) — Cobalt's memory management system
 
 As new components are added, their documentation will be provided in the same directory.
