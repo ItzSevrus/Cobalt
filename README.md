@@ -28,22 +28,6 @@ Cobalt can also recognize custom Cobalt types such as `List` and other library-d
 
 ---
 
-### `var`
-
-The goal of Cobalt is to provide a unified variable representation:
-
-```c
-var x = createVar(10);
-var y = createVar(3.14);
-var z = createVar("Hello");
-```
-
-The type of the supplied value is detected automatically and used to construct the appropriate `var`.
-
-This allows different kinds of values to be handled through a common interface.
-
----
-
 ## 🧠 Design Philosophy
 
 Cobalt is **not intended to replace C**.
@@ -75,10 +59,6 @@ Cobalt
 │
 ├── Type System
 │   └── Automatic type detection
-│
-├── var
-│   └── Generic runtime value representation
-│
 ├── Data Structures
 │   ├── List
 │   └── Matrix
@@ -88,31 +68,6 @@ Cobalt
 ```
 
 The architecture is actively evolving as the project develops.
-
----
-
-## 🔬 Example
-
-A simple example of the intended API:
-
-```c
-#include "cobalt.h"
-
-int main(void)
-{
-    var number = createVar(42);
-    var decimal = createVar(3.14);
-    var text = createVar("Cobalt");
-
-    printVar(number);
-    printVar(decimal);
-    printVar(text);
-
-    return 0;
-}
-```
-
-The user should not need to manually determine the type or interact with Cobalt's internal pointer/type mechanisms for ordinary operations.
 
 ---
 
@@ -130,8 +85,10 @@ cd cobalt
 Build using the project's build system:
 
 ```bash
-make
+make build
 ```
+
+You will find built **cobalt.so** inside **build/lib** directory.
 
 > Build instructions may change while the project is under active development.
 
@@ -161,7 +118,6 @@ Additional types and abstractions will be added as development continues.
 * [ ] Compile-time type detection
 * [ ] Basic datatype system
 * [ ] Initial generic data structures
-* [ ] Redesign `var` API
 * [ ] Simplify pointer handling
 * [ ] Improve memory management
 * [ ] Generic arithmetic operations
