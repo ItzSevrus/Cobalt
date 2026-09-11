@@ -455,20 +455,41 @@ bool freeAll(void)
 */
 void debug_mem_pool(void)
 {
-    printf("\nTony Memory Pool\n");
-    printf("----------------\n");
-    printf("CAP: %zu | USED: %zu\n\n", MEM_CAP, MEM_COUNT);
+    printf("\n");
+    printf("╭────────────────────────────────────╮\n");
+    printf("│          Tony Memory Pool          │\n");
+    printf("├────────────────────────────────────┤\n");
+    printf("│ Capacity : %-22zu  │\n", MEM_CAP);
+    printf("│ Used     : %-22zu  │\n", MEM_COUNT);
+    printf("╰────────────────────────────────────╯\n");
 
-    printf(" ID   PTR\n");
-    printf("------------\n");
+    if (MEM_POOL == NULL) {
+        printf("\n  [ EMPTY ] Memory pool is NULL.\n\n");
+        return;
+    }
+
+    if (MEM_COUNT == 0) {
+        printf("\n  [ EMPTY ] Memory pool has no allocations.\n\n");
+        return;
+    }
+
+    printf("\n");
+    printf("  %-6s %-18s %-12s\n", "ID", "PTR", "STATUS");
+    printf("  ──────────────────────────────────────\n");
 
     for (size_t i = 0; i < MEM_CAP; i++) {
         tPtr *pointer = MEM_POOL[i].pointer;
 
         if (pointer == NULL) {
-            printf(" %2zu   -\n", i);
+            printf("  %-6zu %-18s %-12s\n",
+                   i,
+                   "-",
+                   "FREE");
         } else {
-            printf(" %2zu   %p\n", pointer->id, pointer->ptr);
+            printf("  %-6zu %-18p %-12s\n",
+                   pointer->id,
+                   pointer->ptr,
+                   "USED");
         }
     }
 
