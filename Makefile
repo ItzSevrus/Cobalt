@@ -10,7 +10,7 @@ test:
 	cmake --build build --target test
 
 run-test: test
-	./build/test
+	clear && ./build/test
 
 clean:
 	cmake --build build --target clean
