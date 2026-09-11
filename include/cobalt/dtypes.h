@@ -45,6 +45,13 @@ typedef struct {
     size_t length;
 } CString;
 
+typedef struct {
+    FILE* handle;
+    CString filepath;
+    CString filename;
+    CString mode;
+} CFile;
+
 Clist createList(void);
 CString createString(const char *string);
 
