@@ -42,6 +42,7 @@ typedef struct {
 
 typedef struct {
     tPtr pointer;
+    size_t length;
 } CString;
 
 Clist createList(void);
@@ -58,3 +59,5 @@ void __print(tPtr pointer, const char *sep, const char *end);
 
 #define print(...) \
     __print_select(__VA_ARGS__, __print3, __print2, __print1)(__VA_ARGS__)
+
+void printString(CString *string);
