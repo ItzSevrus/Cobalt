@@ -28,6 +28,7 @@ CString createString(const char *string)
     memcpy(result.pointer.ptr, string, size);
 
     result.pointer.type = TYPE_STRING;
+    result.length = size - 1;
 
     return result;
 }
@@ -65,13 +66,20 @@ void printType(tPtr pointer){
     }
 }
 
-static void printString(CString *string)
+void printStringInline(CString *string)
 {
     if (string == NULL || string->pointer.ptr == NULL) {
         return;
     }
 
     printf("%s", (char *)string->pointer.ptr);
+}
+
+void printString(CString *string){
+    if (string == NULL || string->pointer.ptr == NULL) {
+        return;
+    }
+    printf("%s\n", (char *)string->pointer.ptr);
 }
 
 void __print(tPtr pointer, const char *sep, const char *end)
@@ -98,7 +106,7 @@ void __print(tPtr pointer, const char *sep, const char *end)
             break;
 
         case TYPE_STRING:
-            printString((CString *)pointer.ptr);
+            printStringInline((CString *)pointer.ptr);
             break;
 
         case TYPE_LIST:
