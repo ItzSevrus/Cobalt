@@ -48,7 +48,59 @@ void debug_mem_pool(void);
 
 for inspecting the current state of the memory pool.
 
-> Detailed documentation and usage examples for Tony are available in [`docs/tony.md`](docs/tony.md).
+> **Detailed documentation:** [`docs/tony.md`](docs/tony.md)
+
+---
+
+### Clist — Dynamic Data Lists
+
+**Clist** is Cobalt's dynamic, heterogeneous list implementation.
+
+Lists store references to `tPtr` objects managed by Tony, allowing a single List to contain different Cobalt data types as well as other Lists.
+
+Clist currently supports:
+
+* Dynamic list growth
+* Heterogeneous data
+* Nested Lists
+* Element access
+* Element removal
+* Popping elements
+* Replacing elements
+* Clearing Lists
+* Swapping elements
+* Reversing Lists
+* Recursive List printing
+
+A simple example:
+
+```c
+Clist list = createList();
+
+int value = 10;
+CString name = createString("Sahil");
+
+listAppend(&list, &value);
+listAppend(&list, &name);
+
+listPrint(&list);
+```
+
+Output:
+
+```text
+[10, "Sahil"]
+```
+
+Lists can also contain other Lists:
+
+```text
+[10, [3.14, "Sahil", ['X', [42, "Cobalt", 2.718000]]]]
+```
+
+Clist does not own the underlying allocations. Memory remains managed by Tony.
+
+> **Detailed documentation:** [`docs/list.md`](docs/list.md)
 
 ---
 
@@ -80,13 +132,21 @@ Cobalt is currently being developed as a collection of reusable components.
 ```text
 Cobalt
 │
-└── Tony
-    └── Tracked memory management
-        ├── tPtr
-        ├── Memory Pool
-        ├── Allocation
-        ├── Reallocation
-        └── Deallocation
+├── Tony
+│   └── Tracked memory management
+│       ├── tPtr
+│       ├── Memory Pool
+│       ├── Allocation
+│       ├── Reallocation
+│       └── Deallocation
+│
+└── Clist
+    └── Dynamic heterogeneous lists
+        ├── Element references
+        ├── Dynamic growth
+        ├── Nested lists
+        ├── Mixed data types
+        └── List operations
 ```
 
 The architecture is actively evolving as the project develops.
@@ -135,9 +195,9 @@ Documentation for individual Cobalt components is provided inside the [`docs/`](
 
 Current documentation:
 
-* [`Project Structure`](docs/project-structure.md) - Project's structure
+* [`Project Structure`](docs/project-structure.md) — Project's structure
 * [`Tony`](docs/tony.md) — Cobalt's memory management system
-* [`Clist`](docs/list.md) - Cobalt's Clist datatype
+* [`Clist`](docs/list.md) — Cobalt's dynamic list datatype
 
 As new components are added, their documentation will be provided in the same directory.
 
