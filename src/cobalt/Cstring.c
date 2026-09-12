@@ -165,42 +165,41 @@ Clist stringSplitBy(CString *string, const char *delimiter)
             size_t partLength = i - start;
 
             /*
-                Only create a CString when the
-                resulting part is not empty.
+                Create a CString even when the
+                resulting part is empty.
             */
+            tPtr object = talloc(sizeof(CString));
+
+            if (object.ptr == NULL) {
+                return result;
+            }
+
+            CString *piece = object.ptr;
+
+            piece->pointer = talloc(partLength + 1);
+
+            if (piece->pointer.ptr == NULL) {
+                destroy(object);
+                return result;
+            }
+
             if (partLength > 0) {
-
-                tPtr object = talloc(sizeof(CString));
-
-                if (object.ptr == NULL) {
-                    return result;
-                }
-
-                CString *piece = object.ptr;
-
-                piece->pointer = talloc(partLength + 1);
-
-                if (piece->pointer.ptr == NULL) {
-                    destroy(object);
-                    return result;
-                }
-
                 memcpy(
                     piece->pointer.ptr,
                     data + start,
                     partLength
                 );
+            }
 
-                ((char *)piece->pointer.ptr)[partLength] = '\0';
+            ((char *)piece->pointer.ptr)[partLength] = '\0';
 
-                piece->pointer.type = TYPE_STRING;
-                piece->length = partLength;
+            piece->pointer.type = TYPE_STRING;
+            piece->length = partLength;
 
-                if (!listAppend(&result, piece)) {
-                    destroy(piece->pointer);
-                    destroy(object);
-                    return result;
-                }
+            if (!listAppend(&result, piece)) {
+                destroy(piece->pointer);
+                destroy(object);
+                return result;
             }
 
             if (match) {
