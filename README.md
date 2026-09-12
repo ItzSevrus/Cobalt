@@ -267,6 +267,179 @@ Cobalt I/O uses the standard C `FILE*` internally while integrating dynamically 
 
 ---
 
+### CSV — Comma-Separated Values
+
+**Cobalt CSV** provides a lightweight layer for reading tabular data from CSV files.
+
+The CSV system builds on top of Cobalt's existing `CFile`, `CString`, and `Clist` abstractions.
+
+CSV currently supports:
+
+* Reading individual CSV rows
+* Reading all CSV rows
+* Retrieving a column by its header name
+* Displaying a formatted CSV preview
+* Preserving empty CSV fields
+* Restoring the file cursor after CSV queries and previews
+
+The CSV API currently consists of:
+
+```c
+Clist csvReadRow(CFile *file);
+Clist csvReadRows(CFile *file);
+Clist csvGetByCol(CFile *file, CString *col_name);
+void csvHead(CFile *file);
+```
+
+#### Reading a CSV Row
+
+A single row can be read using:
+
+```c
+Clist row = csvReadRow(&file);
+
+listPrint(&row);
+```
+
+For a CSV row:
+
+```csv
+Sahil,18,Delhi,Computer Science,87
+```
+
+the resulting list is:
+
+```text
+["Sahil", "18", "Delhi", "Computer Science", "87"]
+```
+
+CSV values are currently represented as `CString` objects.
+
+#### Reading All Rows
+
+The entire CSV can be loaded using:
+
+```c
+Clist rows = csvReadRows(&file);
+
+listPrint(&rows);
+```
+
+The result is a nested `Clist`:
+
+```text
+[
+    ["Name", "Age", "City"],
+    ["Sahil", "18", "Delhi"],
+    ["Ali", "19", "Mumbai"]
+]
+```
+
+`csvReadRows()` resets the file cursor after reading.
+
+#### Getting a Column
+
+A column can be retrieved using its header name:
+
+```c
+CString column = createString("Name");
+
+Clist names = csvGetByCol(
+    &file,
+    &column
+);
+
+listPrint(&names);
+```
+
+Output:
+
+```text
+["Sahil", "Ali", "Prateek", "Aarav"]
+```
+
+The function searches the first row for the requested column name and then retrieves that column from the remaining rows.
+
+The original file cursor position is restored after the operation.
+
+#### CSV Preview
+
+`csvHead()` provides a formatted preview of the beginning of a CSV file:
+
+```c
+csvHead(&file);
+```
+
+Example:
+
+```text
+CSV: test.csv
+LOCATED_AT: test/data/test.csv
+
+Name      Age   City        Department               Marks
+-------------------------------------------------------------
+Sahil     18    Delhi       Computer Science         87
+Ali       19    Mumbai      Information Technology   91
+Prateek   20    Jaipur      Mechanical Engineering   76
+```
+
+The function displays up to **10 rows** and calculates column widths to format the output.
+
+The original file cursor position is restored after the preview.
+
+#### Empty Fields
+
+Empty CSV fields are preserved.
+
+For example:
+
+```csv
+Name,Age,City
+Sahil,,Delhi
+,19,
+Ali,20,Mumbai
+```
+
+becomes:
+
+```text
+["Name", "Age", "City"]
+["Sahil", "", "Delhi"]
+["", "19", ""]
+["Ali", "20", "Mumbai"]
+```
+
+This ensures that empty values do not shift subsequent columns.
+
+#### Datatypes
+
+The CSV layer currently treats values as text.
+
+For example:
+
+```csv
+Age,Marks
+18,87
+19,91
+20,76
+```
+
+is initially represented as:
+
+```text
+["18", "87"]
+["19", "91"]
+["20", "76"]
+```
+
+rather than automatically converting the values to C numeric types.
+
+Datatype detection and higher-level data processing are intended for the **Dataset** layer.
+
+> **Detailed documentation:** [`docs/csv.md`](docs/csv.md)
+
+---
+
 ## 🧠 Design Philosophy
 
 Cobalt is **not intended to replace C**.
@@ -330,14 +503,22 @@ Cobalt
 │       ├── Mixed data types
 │       └── List operations
 │
-└── I/O
-    └── File handling
-        ├── File opening
-        ├── File closing
-        ├── Full file reading
-        ├── Line reading
-        ├── Reading all lines
-        └── Cursor management
+├── I/O
+│   └── File handling
+│       ├── File opening
+│       ├── File closing
+│       ├── Full file reading
+│       ├── Line reading
+│       ├── Reading all lines
+│       └── Cursor management
+│
+└── CSV
+    └── CSV data handling
+        ├── Row reading
+        ├── Reading all rows
+        ├── Column lookup
+        ├── CSV preview
+        └── Empty field preservation
 ```
 
 The components work together:
@@ -353,9 +534,15 @@ Tony
        │
        ├── CString
        └── Clist
+              │
+              ▼
+             CSV
+              │
+              ├── CString
+              └── Clist
 ```
 
-Tony provides the memory foundation, CString provides string handling, Clist provides heterogeneous collections, and I/O provides file access.
+Tony provides the memory foundation, CString provides string handling, Clist provides heterogeneous collections, I/O provides file access, and CSV builds a simple tabular-data layer on top of them.
 
 The architecture is actively evolving as the project develops.
 
@@ -408,6 +595,7 @@ Current documentation:
 * [`CString`](docs/Cstring.md) — Cobalt's string abstraction
 * [`Clist`](docs/list.md) — Cobalt's dynamic list datatype
 * [`I/O`](docs/io.md) — Cobalt's file I/O system
+* [`CSV`](docs/csv.md) — Cobalt's CSV reading and querying system
 
 As new components are added, their documentation will be provided in the same directory.
 
@@ -425,7 +613,6 @@ Planned areas include:
 * Improved type handling
 * Generic operations
 * Additional memory management features
-* CSV parsing
 * Dataset abstractions
 * Data processing utilities
 * Better error handling
@@ -443,7 +630,7 @@ The roadmap is intentionally flexible as the architecture evolves.
 
 The API and internal architecture are subject to change.
 
-The project is primarily being developed as an exploration of generic programming, memory management, data structures, string abstractions, file handling, and abstraction techniques in C.
+The project is primarily being developed as an exploration of generic programming, memory management, data structures, string abstractions, file handling, CSV processing, and abstraction techniques in C.
 
 It should not yet be considered a production-ready library.
 

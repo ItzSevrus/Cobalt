@@ -15,6 +15,7 @@ set(COBALT_SOURCES
     src/cobalt/Clist.c
     src/cobalt/Cstring.c
     src/cobalt/io.c
+    src/cobalt/csv.c
 )
 
 # Static library
