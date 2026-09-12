@@ -57,12 +57,24 @@ set_target_properties(cobalt_static cobalt_shared
         ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
 
-add_executable(test
-    test/test.c
-)
+# --------------------------------------------------
+# Tests
+# --------------------------------------------------
 
-target_link_libraries(test PRIVATE cobalt_static)
+option(COBALT_BUILD_TESTS "Build Cobalt tests" OFF)
 
-target_include_directories(test PRIVATE
-    ${CMAKE_SOURCE_DIR}/include
-)
+if(COBALT_BUILD_TESTS)
+
+    add_executable(cobalt_test
+        test/test.c
+    )
+
+    target_link_libraries(cobalt_test PRIVATE
+        cobalt_static
+    )
+
+    target_include_directories(cobalt_test PRIVATE
+        ${CMAKE_SOURCE_DIR}/include
+    )
+
+endif()
